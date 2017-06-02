@@ -1,8 +1,21 @@
 ## Project: Search and Sample Return
 ### Writeup Template: You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
 
----
+---Jupyter Notebook Training
 
+1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
+
+Identified The color threshold settings,Identified pixels not part of navigable terrain as obstacles.So for Obstacle detection,I negated the condition used to identify navigable terrain pixels.Since Rock samples are yellow in color I converted from RGB to HSV format and applied thresholding.
+ 
+
+1. Populate the process_image() function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap. Run process_image() on your test data using the moviepy functions provided to create video output of your result.
+
+Defined the source and destination points.
+Took a perspective transform of the input image.
+Applied 3 different thresholds to extract 3 b/w images of obstacles, rock samples and navigable terrain.
+Converted each of the valid pixels of above images to rover centric coordinates.
+Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world().
+Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
 
 **The goals / steps of this project are the following:**  
 
@@ -34,18 +47,18 @@
 
 #### 1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  
 
-You're reading it!
+
 
 ### Notebook Analysis
 #### 1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
 Here is an example of how to include an image in your writeup.
 
-![alt text][image1]
+
 
 #### 1. Populate the `process_image()` function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap.  Run `process_image()` on your test data using the `moviepy` functions provided to create video output of your result. 
 And another! 
 
-![alt text][image2]
+
 ### Autonomous Navigation and Mapping
 
 #### 1. Fill in the `perception_step()` (at the bottom of the `perception.py` script) and `decision_step()` (in `decision.py`) functions in the autonomous mapping scripts and an explanation is provided in the writeup of how and why these functions were modified as they were.
