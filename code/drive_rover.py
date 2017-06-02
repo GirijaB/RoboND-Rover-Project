@@ -21,6 +21,51 @@ import time
 from perception import perception_step
 from decision import decision_step
 from supporting_functions import update_rover, create_output_images
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import scipy.misc # For saving images as needed
+import glob  # For reading in a list of images from a folder
+import pandas as pd
+from supporting_functions import update_rover, create_output_images
+path = '../test_dataset/IMG/*'
+img_list = glob.glob(path)
+# Grab a random image and display it
+idx = np.random.randint(0, len(img_list)-1)
+image = mpimg.imread(img_list[idx])
+# Import pandas and read in csv file as a dataframe
+
+# Change this path to your data directory
+df = pd.read_csv('../test_dataset/robot_log.csv')
+csv_img_list = df["Path"].tolist() # Create list of image pathnames
+# Read in ground truth map and create a 3-channel image with it
+ground_truth = mpimg.imread('../calibration_images/map_bw.png')
+ground_truth_3d = np.dstack((ground_truth*0, ground_truth*255, ground_truth*0)).astype(np.float)
+
+# Creating a class to be the data container
+# Will read in saved data from csv file and populate this object
+# Worldmap is instantiated as 200 x 200 grids corresponding 
+# to a 200m x 200m space (same size as the ground truth map: 200 x 200 pixels)
+# This encompasses the full range of output position values in x and y from the sim
+class Databucket():
+    def __init__(self):
+        self.images = csv_img_list  
+        self.speed=df["speed"].values
+        self.xpos = df["X_Position"].values
+        self.ypos = df["Y_Position"].values
+        self.yaw = df["Yaw"].values
+        self.pitch=df["pitch"].values
+        self.roll=df["roll"].values
+        self.throttle=df["throttle"].values
+        self.steer=df["steering_angle"].values
+        self.near_sample=df["near_sample"].values
+        self.picking_up = df["picking_up"].values
+        self.image=df["image"].value
+      
+        self.count = -1 # This will be a running index, setting to -1 is a hack
+                        # because moviepy (below) seems to run one extra iteration
+        #self.worldmap = np.zeros((200, 200, 3)).astype(np.float)
+        #self.ground_truth = ground_truth_3d # Ground truth worldmap
+
 # Initialize socketio server and Flask application 
 # (learn more at: https://python-socketio.readthedocs.io/en/latest/)
 sio = socketio.Server()
@@ -44,7 +89,7 @@ class RoverState():
         self.pos = None # Current position (x, y)
         self.yaw = None # Current yaw angle
         self.pitch = None # Current pitch angle
-        self.roll = None # Current roll angle
+        self.roll = None # Current roll anglecd c:
         self.vel = None # Current velocity
         self.steer = 0 # Current steering angle
         self.throttle = 0 # Current throttle value
@@ -59,8 +104,10 @@ class RoverState():
         # of navigable terrain pixels.  This is a very crude form of knowing
         # when you can keep going and when you should stop.  Feel free to
         # get creative in adding new fields or modifying these!
+        self.stop_immediately =0
         self.stop_forward = 50 # Threshold to initiate stopping
         self.go_forward = 500 # Threshold to go forward again
+        self.rock_near = 70
         self.max_vel = 2 # Maximum velocity (meters/second)
         # Image output from perception step
         # Update this image to display your intermediate analysis steps
@@ -71,11 +118,12 @@ class RoverState():
         # obstacles and rock samples
         self.worldmap = np.zeros((200, 200, 3), dtype=np.float) 
         self.samples_pos = None # To store the actual sample positions
-        self.samples_to_find = 0 # To store the initial count of samples
         self.samples_found = 0 # To count the number of samples found
         self.near_sample = 0 # Will be set to telemetry value data["near_sample"]
         self.picking_up = 0 # Will be set to telemetry value data["picking_up"]
         self.send_pickup = False # Set to True to trigger rock pickup
+        self.rock_dists = None
+        self.rock_angles = None
 # Initialize our rover 
 Rover = RoverState()
 
@@ -119,7 +167,7 @@ def telemetry(sid, data):
             send_control(commands, out_image_string1, out_image_string2)
  
             # If in a state where want to pickup a rock send pickup command
-            if Rover.send_pickup and not Rover.picking_up:
+            if Rover.send_pickup:
                 send_pickup()
                 # Reset Rover flags
                 Rover.send_pickup = False
@@ -164,7 +212,7 @@ def send_control(commands, image_string1, image_string2):
         "data",
         data,
         skip_sid=True)
-    eventlet.sleep(0)
+
 # Define a function to send the "pickup" command 
 def send_pickup():
     print("Picking up")
@@ -173,7 +221,7 @@ def send_pickup():
         "pickup",
         pickup,
         skip_sid=True)
-    eventlet.sleep(0)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Remote Driving')
     parser.add_argument(
@@ -185,7 +233,7 @@ if __name__ == '__main__':
     )
     args = parser.parse_args()
     
-    #os.system('rm -rf IMG_stream/*')
+    os.system('rm -rf IMG_stream/*')
     if args.image_folder != '':
         print("Creating image folder at {}".format(args.image_folder))
         if not os.path.exists(args.image_folder):
