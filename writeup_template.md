@@ -33,8 +33,11 @@ Updated world_map with red color for obstacle, green for rock sample and blue fo
 * Fill in the `decision_step()` function within the `decision.py` script with conditional statements that take into consideration the outputs of the `perception_step()` in deciding how to issue throttle, brake and steering commands. 
 * Iterate on your perception and decision function until your rover does a reasonable (need to define metric) job of navigating and mapping.  
 
+Perception_step() function has been updated with image processing functions to create a map. As of now map is displayed almost 100% and fidelity is around 65% all rocks are being detected. Initially i had issues with fidelity as my threshold but after playing with threshold values my fidelity increased to 65%
 
-#### 2. Launching in autonomous mode your rover can navigate and map autonomously.  Explain your results and how you might improve them in your writeup.  
+#### 2. Launching in autonomous mode your rover can navigate and map autonomously.  Explain your results and how you might improve them in your writeup. 
+
+As of now i have to still work on my drive_rover and mostly decision.py code. I could actually write logic to pickup samples when rock samples. I have to learn how efficiently i can arrive on steering angle calculations as per velocity, yaw , distance of the path and navigation angles. Will be working on improving the code to have efficient steering angles and to remember the traversed path and not to again traverse it forsecond time.
 
 **Note: running the simulator with different choices of resolution and graphics quality may produce different results, particularly on different machines!  Make a note of your simulator settings (resolution and graphics quality set on launch) and frames per second (FPS output to terminal by `drive_rover.py`) in your writeup when you submit the project so your reviewer can reproduce your results.**
 
