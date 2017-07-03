@@ -1,21 +1,45 @@
+
 ## Project: Search and Sample Return
-### Writeup Template: You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.
+The goal of this project was to navigate and map rocks autonomously with the rover in autonomous mode.
 
----Jupyter Notebook Training
-
-1. Run the functions provided in the notebook on test images (first with the test data provided, next on data you have recorded). Add/modify functions to allow for color selection of obstacles and rock samples.
-
-Identified The color threshold settings,Identified pixels not part of navigable terrain as obstacles.So for Obstacle detection,I negated the condition used to identify navigable terrain pixels.Since Rock samples are yellow in color I converted from RGB to HSV format and applied thresholding.
- 
-
-1. Populate the process_image() function with the appropriate analysis steps to map pixels identifying navigable terrain, obstacles and rock samples into a worldmap. Run process_image() on your test data using the moviepy functions provided to create video output of your result.
-
-Defined the source and destination points.
-Took a perspective transform of the input image.
-Applied 3 different thresholds to extract 3 b/w images of obstacles, rock samples and navigable terrain.
+My first goal was to identify the color threshold settings,in the project.
+In summary, 
+I Defined the source and destination points.
+Then Took a perspective transform of the input image.
+Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain.
 Converted each of the valid pixels of above images to rover centric coordinates.
 Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world().
 Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
+
+![Alt text](/output/Colored_warped_example2.png?raw=true)
+
+a. For Obstacles: I observed that whichever pixels were not part of the navigable terrain, are part of obstacles. Also, sample stones were detected as navigable terrain. So for detectin obstacles, I have simply used the negation of the condition used to identify navigable terrain pixels. Refer to function rocks(img).
+
+b. For identifying sample rocks: The rocks are yellow in color. I found that it is easier to threshold for colors in HSV format. I used the cv2 library. First I converted my image from RGB to BGR. Then I converted it to HSV format and applied thresholding. Refer to function obstacle(img).
+
+Applied 3 different thresholds to extract 3 colors, images of obstacles, rock samples and navigable terrain.
+
+def rocks(img):
+        low_yellow = np.array([120, 120,0])
+        high_yellow = np.array([255,255,20])# convert to HSV space
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)    # mask yellow values
+        mask_rock = cv2.inRange(img_hsv, low_yellow, high_yellow)
+        res = cv2.bitwise_and(img,img, mask= mask_rock)
+        return res[:,:,0]
+    def obstacles(img):
+        mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
+        color_select = cv2.bitwise_and(img,img, mask= mask)
+        return color_select[:,:,2]
+    def navi_color_thresh(img, rgb_thresh=(160, 160, 160)): # Create an array of zeros same xy size as img, but single channel
+        mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
+        color_select = cv2.bitwise_and(img,img, mask= mask)
+        return color_select[:,:,0]
+    
+    warped_navi = navi_color_thresh(warped, rgb_thresh=(160, 160, 160))
+    warped_obs = obstacles(warped)
+    warped_rocks = rocks(warped)
+
+ 
 
 **The goals / steps of this project are the following:**  
 
