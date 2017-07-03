@@ -8,7 +8,7 @@ My first goal was to make changes in perception code.
 In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain.
 
 a. For Obstacles: I observed that whichever pixels were not part of the navigable terrain, are part of obstacles. Also, sample stones were detected as navigable terrain. So for detectin obstacles, I have simply used the negation of the condition used to identify navigable terrain pixels. Refer to function rocks(img).
-s
+ds
 b. For identifying sample rocks: The rocks are yellow in color. I found that it is easier to threshold for colors in HSV format. I used the cv2 library. First I converted my image from RGB to BGR. Then I converted it to HSV format and applied thresholding. Refer to function obstacle(img).
 
 Applied 3 different thresholds to extract 3 colors, images of obstacles, rock samples and navigable terrain.
@@ -38,7 +38,7 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
          
     def navi_color_thresh(img, rgb_thresh=(160, 160, 160)):
     
-
+    
         mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
 
         color_select = cv2.bitwise_and(img,img, mask= mask)
@@ -60,6 +60,22 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
 Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Additionally, distances and angles for Rover's obstacle pixels, rock sample pixels and navigable pixels were added. Obstacle distances are used in decision.py. 
 test_mapping.mp4 is in output directory which was the video generated after performing all the above steps.
 
+ code to Convert rover-centric pixel values to world coords:-
+
+        x_world, y_world = pix_to_world(x_navi, y_navi, posx , posy , Rover.yaw , Rover.worldmap.shape[0], scale)
+
+        x_world_obstacle, y_world_obstacle = pix_to_world(x_obs, y_obs, posx , posy , Rover.yaw , Rover.worldmap.shape[0], scale)
+
+        x_world_rock, y_world_rock = pix_to_world(x_rocks, y_rocks, posx , posy , Rover.yaw , Rover.worldmap.shape[0], scale)
+
+  code to Add pixel positions to worldmap and Update worldmap (to be displayed on right side of screen)
+
+        Rover.worldmap[y_world_obstacle, x_world_obstacle,0] = 255
+
+        Rover.worldmap[y_world_rock, x_world_rock, 1] = 255
+
+        Rover.worldmap[y_world, x_world, 2] = 255
+      
 ![Demo](/output/test_mapping.mp4)
 
 Next goal was to edit decision.py:-
