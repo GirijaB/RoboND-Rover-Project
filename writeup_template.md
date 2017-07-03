@@ -3,7 +3,8 @@ Project: Search and Sample Return
 
 The goal of this project was to navigate and map rocks autonomously with the rover in autonomous mode.
 
-My first goal was to identify the color threshold settings,in the project. 
+My first goal was to make changes in perception code.
+
 In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain. Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
 
 
@@ -13,36 +14,41 @@ b. For identifying sample rocks: The rocks are yellow in color. I found that it 
 
 Applied 3 different thresholds to extract 3 colors, images of obstacles, rock samples and navigable terrain.
 
-def rocks(img):
-    low_yellow = np.array([120, 120,0])
+    def rocks(img):
     
-    high_yellow = np.array([255,255,20])# convert to HSV space
-    
-    img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)    # mask yellow values
-    
-     mask_rock = cv2.inRange(img_hsv, low_yellow, high_yellow)
+        low_yellow = np.array([120, 120,0])
+
+        high_yellow = np.array([255,255,20])# convert to HSV space
+
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)    # mask yellow values
+
+         mask_rock = cv2.inRange(img_hsv, low_yellow, high_yellow)
+
+         res = cv2.bitwise_and(img,img, mask= mask_rock)
      
-     res = cv2.bitwise_and(img,img, mask= mask_rock)
-     
-     return res[:,:,0]
-def obstacles(img):
-    mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
-    
-    color_select = cv2.bitwise_and(img,img, mask= mask)
-    
-    return color_select[:,:,2]
-def navi_color_thresh(img, rgb_thresh=(160, 160, 160)):
-    mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
-    
-    color_select = cv2.bitwise_and(img,img, mask= mask)
-    
-    return color_select[:,:,0]
+        return res[:,:,0]
         
-warped_navi = navi_color_thresh(warped, rgb_thresh=(160, 160, 160))
+    def obstacles(img):
+    
+         mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
+    
+         color_select = cv2.bitwise_and(img,img, mask= mask)
+    
+         return color_select[:,:,2]
+         
+    def navi_color_thresh(img, rgb_thresh=(160, 160, 160)):
+    
+        mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
 
-warped_obs = obstacles(warped)
+        color_select = cv2.bitwise_and(img,img, mask= mask)
 
-warped_rocks = rocks(warped)
+        return color_select[:,:,0]
+        
+    warped_navi = navi_color_thresh(warped, rgb_thresh=(160, 160, 160))
+
+    warped_obs = obstacles(warped)
+
+    warped_rocks = rocks(warped)
 
 The goals / steps of this project are the following:
 Training / Calibration
