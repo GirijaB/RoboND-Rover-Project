@@ -5,8 +5,7 @@ The goal of this project was to navigate and map rocks autonomously with the rov
 
 My first goal was to make changes in perception code.
 
-In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain. Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
-
+In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain.
 
 a. For Obstacles: I observed that whichever pixels were not part of the navigable terrain, are part of obstacles. Also, sample stones were detected as navigable terrain. So for detectin obstacles, I have simply used the negation of the condition used to identify navigable terrain pixels. Refer to function rocks(img).
 
@@ -49,6 +48,16 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
     warped_obs = obstacles(warped)
 
     warped_rocks = rocks(warped)
+    
+   ![Alt text](/rock_img.jpg?raw=true)
+   
+   ![Alt text](/warped_example.jpg?raw=true)
+    
+   ![Alt text](/Colored_warped_example2.jpg?raw=true)
+
+    
+Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
+
 
 The goals / steps of this project are the following:
 Training / Calibration
