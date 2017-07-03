@@ -106,6 +106,10 @@ Scope of Improvements:-
 As of now i have to still work on my drive_rover and mostly decision.py code. I could actually write logic to pickup samples . I have to learn how efficiently i can arrive on steering angle calculations as per velocity, yaw , distance of the path and navigation angles. Will be working on improving the code to have efficient steering angles and to remember the traversed path and not to again traverse it for second time.
 
 The rover simulator settings were as follows in autonomous mode.
+
 Resolution -------------------> 800 * 600
+
 Graphics quality -------------> Fantastic
+
 FPS o/p ----------------------> 5
+
