@@ -20,7 +20,9 @@ b. For identifying sample rocks: The rocks are yellow in color. I found that it 
 
 Applied 3 different thresholds to extract 3 colors, images of obstacles, rock samples and navigable terrain.
 
+
 def rocks(img):
+
         low_yellow = np.array([120, 120,0])
         
         high_yellow = np.array([255,255,20])# convert to HSV space
@@ -33,19 +35,29 @@ def rocks(img):
          
          return res[:,:,0]
          
+         
 def obstacles(img):
 
         mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
+        
         color_select = cv2.bitwise_and(img,img, mask= mask)
+        
         return color_select[:,:,2]
+        
     def navi_color_thresh(img, rgb_thresh=(160, 160, 160)): # Create an array of zeros same xy size as img, but single channel
-        mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
-        color_select = cv2.bitwise_and(img,img, mask= mask)
-        return color_select[:,:,0]
     
+        mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
+        
+        color_select = cv2.bitwise_and(img,img, mask= mask)
+        
+        return color_select[:,:,0]
+            
     warped_navi = navi_color_thresh(warped, rgb_thresh=(160, 160, 160))
+    
     warped_obs = obstacles(warped)
+    
     warped_rocks = rocks(warped)
+    
 
  
 
