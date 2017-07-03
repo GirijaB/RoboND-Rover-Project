@@ -1,10 +1,18 @@
+
 Project: Search and Sample Return
+
 The goal of this project was to navigate and map rocks autonomously with the rover in autonomous mode.
-My first goal was to identify the color threshold settings,in the project. In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain. Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
+
+My first goal was to identify the color threshold settings,in the project. 
+In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain. Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
+
 
 a. For Obstacles: I observed that whichever pixels were not part of the navigable terrain, are part of obstacles. Also, sample stones were detected as navigable terrain. So for detectin obstacles, I have simply used the negation of the condition used to identify navigable terrain pixels. Refer to function rocks(img).
+
 b. For identifying sample rocks: The rocks are yellow in color. I found that it is easier to threshold for colors in HSV format. I used the cv2 library. First I converted my image from RGB to BGR. Then I converted it to HSV format and applied thresholding. Refer to function obstacle(img).
+
 Applied 3 different thresholds to extract 3 colors, images of obstacles, rock samples and navigable terrain.
+
 def rocks(img):
     low_yellow = np.array([120, 120,0])
     
@@ -35,6 +43,7 @@ warped_navi = navi_color_thresh(warped, rgb_thresh=(160, 160, 160))
 warped_obs = obstacles(warped)
 
 warped_rocks = rocks(warped)
+
 The goals / steps of this project are the following:
 Training / Calibration
 Download the simulator and take data in "Training Mode"
