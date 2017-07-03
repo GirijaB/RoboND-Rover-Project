@@ -1,4 +1,5 @@
 
+
 ## Project: Search and Sample Return
 The goal of this project was to navigate and map rocks autonomously with the rover in autonomous mode.
 
@@ -21,11 +22,17 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
 
 def rocks(img):
         low_yellow = np.array([120, 120,0])
+        
         high_yellow = np.array([255,255,20])# convert to HSV space
+        
         img_hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)    # mask yellow values
+        
          mask_rock = cv2.inRange(img_hsv, low_yellow, high_yellow)
+         
          res = cv2.bitwise_and(img,img, mask= mask_rock)
+         
          return res[:,:,0]
+         
 def obstacles(img):
 
         mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
