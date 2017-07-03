@@ -8,7 +8,7 @@ My first goal was to make changes in perception code.
 In summary, I Defined the source and destination points. Then Took a perspective transform of the input image. Applied 3 different thresholds to extract 3 colors images of obstacles, rock samples and navigable terrain.
 
 a. For Obstacles: I observed that whichever pixels were not part of the navigable terrain, are part of obstacles. Also, sample stones were detected as navigable terrain. So for detectin obstacles, I have simply used the negation of the condition used to identify navigable terrain pixels. Refer to function rocks(img).
-
+s
 b. For identifying sample rocks: The rocks are yellow in color. I found that it is easier to threshold for colors in HSV format. I used the cv2 library. First I converted my image from RGB to BGR. Then I converted it to HSV format and applied thresholding. Refer to function obstacle(img).
 
 Applied 3 different thresholds to extract 3 colors, images of obstacles, rock samples and navigable terrain.
@@ -28,7 +28,7 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
         return res[:,:,0]
         
 
-def obstacles(img):
+    def obstacles(img):
     
          mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
     
@@ -38,6 +38,7 @@ def obstacles(img):
          
     def navi_color_thresh(img, rgb_thresh=(160, 160, 160)):
     
+
         mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
 
         color_select = cv2.bitwise_and(img,img, mask= mask)
@@ -57,10 +58,77 @@ def obstacles(img):
    ![Alt text](/Colored_warped_example2.jpg?raw=true)
 
 Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Additionally, distances and angles for Rover's obstacle pixels, rock sample pixels and navigable pixels were added. Obstacle distances are used in decision.py. 
+test_mapping.mp4 is in output directory which was the video generated after performing all the above steps.
 
- ![Demo](/output/test_mapping.gif)
+![Demo](/output/test_mapping.mp4)
 
-Next goal was to edit drive_rover.py
+Next goal was to edit decision.py:-
+
+ The rover keeps to the left side of the wall. If it is very close to the left wall, it turns slightly to right. If it is stuck and doesn't go to 'stop' mode, it turns right. 
+
+The same loop repeats for each frame. Detailed description follows below: In forward mode, following functionalities were added: The rover should move close to left side of the wall. For this, average angle of navigable terrain to Rover's left, the left side obstacle distances (where obstacle_angle > 0) and the right side obstacle distances (where obstacle_angle < 0) are used.
+ 
+ Next, the rover is preferred to go to left, hence in calculating Rover.steer from mean of navigable angles, 8 degrees are added to each angle so that the average inclination is a bit to left than the actual average navigable angles. Next, if right side obstacle is closer than left side obstacle and there is no immediate wall on left (checked through nav_left which is average angle of left side navigable pixels) then the rover turns left. Further if the nav_left is less than certain threshold (i.e. rover is very close to wall), the rover is turned right. In case the roll and pitch angles are out of certain limit, the rover is stopped and turned and enters into 'stop' mode. Also, if Rover velocity remains zero for more than one second, then Rover enters 'stuck' mode. In stuck mode, it takes a 4 wheel turn for some time period and then goes back to 'forward' mode. Sometimes when rover hits a rock, (somehow) it sees enough navigable points through the rock and never goes to 'stop' mode. It used to get stuck there. Also, in some small region in the map the rover doesn't go right even when it is stuck on the left wall.The above condition helps rover come out of these situations.
+ 
+ sample code of decision.py is as follows:-
+             if (np.any(Rover.nav_angles > 0)):
+
+                nav_left = np.average(Rover.nav_angles * 180/np.pi, weights=(Rover.nav_angles > 0))
+
+              else:
+
+                 nav_left = -1
+              
+                wall_left_dist = np.average(Rover.obst_dists * 180/np.pi, weights=(Rover.obst_angles > 0))
+
+                wall_right_dist = np.average(Rover.obst_dists * 180/np.pi, weights=(Rover.obst_angles < 0))
+
+                Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi + 8), -15, 15)
+
+                if(nav_left > 5 and ((wall_right_dist < wall_left_dist))): # and wall_left_dist > 1
+
+                    Rover.steer = 15
+
+                elif(nav_left < 5 and (nav_left != -1)):
+
+                    Rover.steer = -15
+
+                ###### Taking care of roll and pitch variations #####
+
+                if((Rover.roll > 1 and Rover.roll < 359) or (Rover.pitch > 0.5 and Rover.pitch < 0.5)):
+
+                    Rover.throttle = 0
+
+                    if Rover.vel < 0.2:
+
+                        Rover.steer = -15
+
+                        Rover.mode = 'stop'
+
+                    elif Rover.vel > 0.2:
+
+                        Rover.steer = 0
+
+                        Rover.brake = Rover.break_set
+
+                        Rover.mode = 'forward'
+
+                if(Rover.vel > 0):
+
+                    Rover.stuck_time = 0
+
+                elif (Rover.total_time > 1 and Rover.vel == 0.0):
+
+                    if Rover.stuck_time == 0:
+
+                        Rover.stuck_time = Rover.total_time
+
+                    elif (Rover.total_time - Rover.stuck_time) > 1:
+
+                        Rover.mode = 'stuck'
+ 
+ 
+
 
 
 The goals / steps of this project are the following:
