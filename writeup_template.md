@@ -55,8 +55,11 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
     
    ![Alt text](/Colored_warped_example2.jpg?raw=true)
 
-    
-Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Updated world_map with red color for obstacle, green for rock sample and blue for navigable terrain. The video is at location. "test_mapping.mp4"
+Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Additionally, distances and angles for Rover's obstacle pixels, rock sample pixels and navigable pixels were added. Obstacle distances are used in decision.py. 
+
+ ![Alt text](/output/test_mapping.mp4?raw=true)
+
+Next goal was to edit drive_rover.py
 
 
 The goals / steps of this project are the following:
@@ -66,6 +69,9 @@ Test out the functions in the Jupyter Notebook provided
 Add functions to detect obstacles and samples of interest (golden rocks)
 Fill in the process_image() function with the appropriate image processing steps (perspective transform, color threshold etc.) to get from raw images to a map. The output_image you create in this step should demonstrate that your mapping pipeline works.
 Use moviepy to process the images in your saved dataset with the process_image() function. Include the video you produce as part of your submission.
+
+
+
 Autonomous Navigation / Mapping
 Fill in the perception_step() function within the perception.py script with the appropriate image processing functions to create a map and update Rover() data (similar to what you did with process_image() in the notebook).
 Fill in the decision_step() function within the decision.py script with conditional statements that take into consideration the outputs of the perception_step() in deciding how to issue throttle, brake and steering commands.
