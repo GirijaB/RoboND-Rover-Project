@@ -44,8 +44,8 @@ def obstacles(img):
         
         return color_select[:,:,2]
         
-    def navi_color_thresh(img, rgb_thresh=(160, 160, 160)): # Create an array of zeros same xy size as img, but single channel
-    
+ def navi_color_thresh(img, rgb_thresh=(160, 160, 160)):
+ 
         mask = cv2.inRange(img, np.array(rgb_thresh), np.array([255,255,255]))
         
         color_select = cv2.bitwise_and(img,img, mask= mask)
