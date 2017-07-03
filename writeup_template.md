@@ -27,7 +27,8 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
      
         return res[:,:,0]
         
-    def obstacles(img):
+
+def obstacles(img):
     
          mask = cv2.inRange(img, np.array([45,40,30]), np.array([160,120,100]))
     
@@ -57,7 +58,7 @@ Applied 3 different thresholds to extract 3 colors, images of obstacles, rock sa
 
 Converted each of the valid pixels of above images to rover centric coordinates. Converted each of these 3 images' rover centric coordinates to real world coordinates with pix_to_world(). Additionally, distances and angles for Rover's obstacle pixels, rock sample pixels and navigable pixels were added. Obstacle distances are used in decision.py. 
 
- ![Alt text](/output/test_mapping.mp4?raw=true)
+ ![Demo](/output/test_mapping.gif)
 
 Next goal was to edit drive_rover.py
 
