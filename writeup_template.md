@@ -70,64 +70,6 @@ The same loop repeats for each frame. Detailed description follows below: In for
  
  Next, the rover is preferred to go to left, hence in calculating Rover.steer from mean of navigable angles, 8 degrees are added to each angle so that the average inclination is a bit to left than the actual average navigable angles. Next, if right side obstacle is closer than left side obstacle and there is no immediate wall on left (checked through nav_left which is average angle of left side navigable pixels) then the rover turns left. Further if the nav_left is less than certain threshold (i.e. rover is very close to wall), the rover is turned right. In case the roll and pitch angles are out of certain limit, the rover is stopped and turned and enters into 'stop' mode. Also, if Rover velocity remains zero for more than one second, then Rover enters 'stuck' mode. In stuck mode, it takes a 4 wheel turn for some time period and then goes back to 'forward' mode. Sometimes when rover hits a rock, (somehow) it sees enough navigable points through the rock and never goes to 'stop' mode. It used to get stuck there. Also, in some small region in the map the rover doesn't go right even when it is stuck on the left wall.The above condition helps rover come out of these situations.
  
- sample code of decision.py is as follows:-
-             if (np.any(Rover.nav_angles > 0)):
-
-                nav_left = np.average(Rover.nav_angles * 180/np.pi, weights=(Rover.nav_angles > 0))
-
-              else:
-
-                 nav_left = -1
-              
-                wall_left_dist = np.average(Rover.obst_dists * 180/np.pi, weights=(Rover.obst_angles > 0))
-
-                wall_right_dist = np.average(Rover.obst_dists * 180/np.pi, weights=(Rover.obst_angles < 0))
-
-                Rover.steer = np.clip(np.mean(Rover.nav_angles * 180/np.pi + 8), -15, 15)
-
-                if(nav_left > 5 and ((wall_right_dist < wall_left_dist))): # and wall_left_dist > 1
-
-                    Rover.steer = 15
-
-                elif(nav_left < 5 and (nav_left != -1)):
-
-                    Rover.steer = -15
-
-                ###### Taking care of roll and pitch variations #####
-
-                if((Rover.roll > 1 and Rover.roll < 359) or (Rover.pitch > 0.5 and Rover.pitch < 0.5)):
-
-                    Rover.throttle = 0
-
-                    if Rover.vel < 0.2:
-
-                        Rover.steer = -15
-
-                        Rover.mode = 'stop'
-
-                    elif Rover.vel > 0.2:
-
-                        Rover.steer = 0
-
-                        Rover.brake = Rover.break_set
-
-                        Rover.mode = 'forward'
-
-                if(Rover.vel > 0):
-
-                    Rover.stuck_time = 0
-
-                elif (Rover.total_time > 1 and Rover.vel == 0.0):
-
-                    if Rover.stuck_time == 0:
-
-                        Rover.stuck_time = Rover.total_time
-
-                    elif (Rover.total_time - Rover.stuck_time) > 1:
-
-                        Rover.mode = 'stuck'
- 
- 
 
 
 
